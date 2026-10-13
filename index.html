@@ -3,88 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10172b">
 <title>Diamond Quest</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#10172b;color:white;font-family:Arial;text-align:center}
-header{background:#202d50;padding:18px;display:flex;justify-content:space-between}
-main{max-width:480px;margin:auto;padding:16px}
-.card{background:#1b2542;padding:18px;border-radius:16px;margin:16px 0}
-button{background:#5688ff;color:white;border:0;border-radius:10px;padding:12px;margin:6px;font-weight:bold}
-#crystal{font-size:80px;padding:20px}
-.item{display:flex;justify-content:space-between;align-items:center}
-small{color:#b9c6e8}
+body{
+  margin:0;background:#10172b;color:white;
+  font-family:Arial,sans-serif;text-align:center
+}
+header{
+  background:#202d50;padding:18px;
+  display:flex;justify-content:space-between;
+  align-items:center
+}
+main{max-width:500px;margin:auto;padding:16px}
+.card{
+  background:#1b2542;padding:20px;
+  border-radius:18px;margin:16px 0
+}
+button{
+  background:#5688ff;color:white;border:0;
+  border-radius:12px;padding:13px 16px;
+  margin:6px;font-weight:bold;font-size:15px
+}
+button:active{transform:scale(.97)}
+#crystal{font-size:80px;padding:18px}
+.item{
+  display:flex;align-items:center;
+  justify-content:space-between;gap:8px;
+  padding:10px 0;border-bottom:1px solid #354160
+}
+small{color:#bdc9e7}
+#message{color:#9fd8ff}
 </style>
 </head>
+
 <body>
 <header>
-<strong>💎 Diamond Quest</strong>
-<strong>💎 <span id="diamonds">0</span></strong>
+  <strong>💎 Diamond Quest</strong>
+  <strong>💎 <span id="diamonds">0</span></strong>
 </header>
+
 <main>
-<section class="card">
-<h2>Crystal Adventure</h2>
-<div id="crystal">💎</div>
-<button onclick="collect()">Collect Crystal</button>
-<p>Points: <span id="points">0</span></p>
-</section>
+  <section class="card">
+    <h2>Crystal Adventure</h2>
+    <div id="crystal">💎</div>
+    <button onclick="collect()">Collect Crystal</button>
+    <p>Game points: <span id="points">0</span></p>
+    <small>Collect crystals and explore the game.</small>
+  </section>
 
-<section class="card">
-<h3>🎬 Watch an Ad</h3>
-<p>Earn 10 Diamonds by completing an eligible advertisement.</p>
-<button onclick="watchAd()">Watch Video</button>
-<p id="adStatus"><small>Advertisement service not connected.</small></p>
-</section>
+  <section class="card">
+    <h3>🎬 Earn Diamonds</h3>
+    <p>Watch an eligible rewarded ad to earn 10 Diamonds.</p>
+    <button onclick="watchAd()">Watch Video · +10 💎</button>
+    <p id="adStatus"><small>Rewarded ads are not connected.</small></p>
+  </section>
 
-<section class="card">
-<h3>🛒 Diamond Shop</h3>
-<div class="item">
-<span>⚔️ Magic Sword — 20 💎</span>
-<button onclick="buy(20,'Magic Sword')">Buy</button>
-</div>
-<div class="item">
-<span>🛡️ Golden Shield — 30 💎</span>
-<button onclick="buy(30,'Golden Shield')">Buy</button>
-</div>
-<p id="message"></p>
-<h3>Your Items</h3>
-<p id="inventory">No items yet.</p>
-</section>
+  <section class="card">
+    <h3>🛒 Diamond Shop</h3>
+
+    <div class="item">
+      <span>⚔️ Magic Sword<br><small>20 Diamonds</small></span>
+      <button onclick="buy(20,'Magic Sword')">Buy</button>
+    </div>
+
+    <div class="item">
+      <span>🛡️ Golden Shield<br><small>30 Diamonds</small></span>
+      <button onclick="buy(30,'Golden Shield')">Buy</button>
+    </div>
+
+    <div class="item">
+      <span>✨ Magic Potion<br><small>10 Diamonds</small></span>
+      <button onclick="buy(10,'Magic Potion')">Buy</button>
+    </div>
+
+    <p id="message"></p>
+    <h3>Your Items</h3>
+    <p id="inventory">No items yet.</p>
+  </section>
 </main>
+
 <script>
-let points=0;
-let diamonds=0;
-let items=[];
+let points = 0;
+let diamonds = 0;
+let items = [];
 
 function render(){
-document.getElementById('points').textContent=points;
-document.getElementById('diamonds').textContent=diamonds;
-document.getElementById('inventory').textContent=
-items.length?items.join(', '):'No items yet.';
+  document.getElementById('points').textContent = points;
+  document.getElementById('diamonds').textContent = diamonds;
+  document.getElementById('inventory').textContent =
+    items.length ? items.join(', ') : 'No items yet.';
 }
 
 function collect(){
-points++;
-document.getElementById('crystal').textContent=
-['💎','✨','🔮','🌟'][Math.floor(Math.random()*4)];
-render();
+  points++;
+  document.getElementById('crystal').textContent =
+    ['💎','✨','🔮','🌟'][Math.floor(Math.random()*4)];
+  render();
 }
 
 function watchAd(){
-document.getElementById('adStatus').textContent=
-'Demo mode: no real ad was shown and no Diamonds were awarded.';
+  document.getElementById('adStatus').textContent =
+    'Demo mode: no real ad was shown and no Diamonds were awarded.';
 }
 
 function buy(cost,name){
-if(diamonds<cost){
-document.getElementById('message').textContent='Not enough Diamonds!';
-return;
+  if(diamonds < cost){
+    document.getElementById('message').textContent =
+      'Not enough Diamonds!';
+    return;
+  }
+
+  diamonds -= cost;
+  items.push(name);
+  document.getElementById('message').textContent =
+    'You unlocked: ' + name;
+  render();
 }
-diamonds-=cost;
-items.push(name);
-document.getElementById('message').textContent='Unlocked: '+name;
-render();
-}
+
 render();
 </script>
 </body>
