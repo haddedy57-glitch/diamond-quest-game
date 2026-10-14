@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#090e20">
-
-<title>Diamond Quest - Crystal Adventure</title>
-<meta name="description" content="Enter Diamond Quest, collect magical crystals, upgrade your powers, complete quests and build your ultimate crystal collection.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090d20">
+<meta name="description" content="Diamond Quest - Fight monsters, explore five stages, and collect diamonds!">
+<title>Diamond Quest — Adventure</title>
 
 <script async
 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2542364537334762"
@@ -14,733 +13,469 @@ crossorigin="anonymous"></script>
 
 <style>
 :root {
-  --bg:#080d1d;
-  --panel:#111a32;
-  --panel2:#172341;
-  --text:#f4f7ff;
-  --muted:#9baacc;
-  --cyan:#42e8ff;
-  --purple:#a78bfa;
+  color-scheme: dark;
+  --bg:#090d20;
+  --panel:#141b35;
   --gold:#ffd166;
-  --green:#59e3a7;
+  --cyan:#67e8f9;
+  --red:#ff647c;
+  --green:#65f0a2;
 }
-
 * { box-sizing:border-box; }
-
 body {
   margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(ellipse at top,#202d59 0%,transparent 55%),
-    var(--bg);
   min-height:100vh;
+  font-family:system-ui,Arial,sans-serif;
+  color:#f6f7ff;
+  background:
+    radial-gradient(ellipse at top,#26366b 0%,transparent 55%),
+    var(--bg);
 }
-
-button { font:inherit; cursor:pointer; }
-
-button:focus-visible {
-  outline:3px solid var(--gold);
-  outline-offset:3px;
-}
-
-.container {
-  width:min(1100px,94%);
-  margin:auto;
-}
-
 header {
-  padding:20px 0;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
-}
-
-.logo {
-  font-size:23px;
-  font-weight:900;
-  letter-spacing:-1px;
-}
-
-.logo span { color:var(--cyan); }
-
-.level-badge {
-  background:#1c2949;
-  border:1px solid #34466f;
-  border-radius:30px;
-  padding:9px 15px;
-  font-size:13px;
-  font-weight:800;
-}
-
-.hero {
   text-align:center;
-  padding:32px 16px 25px;
-  border:1px solid #29375c;
-  border-radius:26px;
-  background:linear-gradient(145deg,#17264b,#10162b 70%);
-  box-shadow:0 20px 70px #0003;
-  overflow:hidden;
-  position:relative;
+  padding:24px 12px 12px;
 }
-
-.eyebrow {
-  color:var(--cyan);
-  font-size:12px;
-  font-weight:900;
-  letter-spacing:3px;
-  text-transform:uppercase;
-}
-
 h1 {
-  margin:12px 0 8px;
-  font-size:clamp(29px,6vw,48px);
-  line-height:1.12;
-}
-
-.subtitle {
-  color:var(--muted);
-  margin:0 auto;
-  max-width:480px;
-  line-height:1.6;
-}
-
-.stats {
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:12px;
-  margin-top:25px;
-}
-
-.stat {
-  padding:15px 8px;
-  background:#0a1228a8;
-  border:1px solid #2b3c62;
-  border-radius:17px;
-}
-
-.stat .value {
-  font-size:clamp(19px,4vw,28px);
-  font-weight:900;
-  overflow-wrap:anywhere;
-}
-
-.stat .label {
-  font-size:11px;
-  color:var(--muted);
-  margin-top:4px;
-  text-transform:uppercase;
+  margin:0;
+  font-size:clamp(28px,7vw,43px);
+  color:var(--gold);
   letter-spacing:1px;
 }
-
-.game-layout {
+.subtitle { color:#b9c6ed; margin-top:5px; }
+.container { width:min(700px,94%); margin:auto; padding-bottom:35px; }
+.stats {
   display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:18px;
-  margin:20px 0;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+  margin:14px 0;
 }
-
-.card {
-  background:linear-gradient(145deg,var(--panel),#0d1428);
-  border:1px solid #273656;
-  border-radius:22px;
-  padding:21px;
-  min-width:0;
+.stat,.panel {
+  background:rgba(20,27,53,.94);
+  border:1px solid #34416d;
+  border-radius:16px;
+  padding:14px;
 }
-
-.card h2 {
-  font-size:19px;
-  margin:0 0 6px;
-}
-
-.description {
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.6;
-  margin:0 0 18px;
-}
-
-.crystal-stage {
-  min-height:240px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  position:relative;
-  overflow:hidden;
-  border-radius:20px;
-  background:
-    radial-gradient(circle,#273e71 0%,#142344 35%,#0c1429 75%);
-  border:1px solid #344a78;
-}
-
-.crystal-stage::before,
-.crystal-stage::after {
-  content:"✦";
-  position:absolute;
-  color:#86f3ff;
-  opacity:.55;
-  font-size:20px;
-}
-
-.crystal-stage::before {
-  top:25px;
-  left:18%;
-}
-
-.crystal-stage::after {
-  bottom:28px;
-  right:19%;
-}
-
-.crystal-button {
-  border:0;
-  background:transparent;
-  padding:15px;
-  width:190px;
-  height:190px;
-  display:grid;
-  place-items:center;
-  position:relative;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-}
-
-.crystal {
-  font-size:110px;
-  filter:drop-shadow(0 0 12px #42e8ff)
-         drop-shadow(0 0 35px #6979ff);
-  transition:transform .12s;
-  user-select:none;
-}
-
-.crystal-button:active .crystal {
-  transform:scale(.86) rotate(-8deg);
-}
-
-.tap-hint {
+.stat { text-align:center; }
+.stat small { display:block; color:#b7c4e7; margin-bottom:5px; }
+.stat strong { font-size:20px; }
+.gold { color:var(--gold); }
+.health { color:var(--red); }
+.stage { color:var(--cyan); }
+.arena {
   text-align:center;
-  color:var(--muted);
-  font-size:12px;
-  margin:12px 0 0;
-}
-
-.progress-info {
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  color:var(--muted);
-  font-size:12px;
-  margin:18px 0 8px;
-}
-
-.progress-track {
-  height:9px;
-  background:#263453;
+  padding:24px 14px;
   border-radius:20px;
+  border:1px solid #43558a;
+  background:linear-gradient(145deg,#202b55,#11172d);
   overflow:hidden;
 }
-
-.progress-fill {
-  height:100%;
-  width:0%;
+.scene { font-size:76px; margin:10px 0; }
+.enemy { font-size:60px; }
+.enemy-name { font-weight:800; font-size:21px; }
+.muted { color:#b8c4e6; font-size:14px; }
+.bar {
+  height:12px;
+  background:#303957;
   border-radius:20px;
-  background:linear-gradient(90deg,var(--cyan),var(--purple));
+  overflow:hidden;
+  margin:10px 0;
+}
+.bar > div {
+  height:100%;
+  width:100%;
+  background:var(--red);
   transition:width .25s;
 }
-
-.section-title {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+.playerbar > div { background:var(--green); }
+button {
+  border:0;
+  border-radius:12px;
+  padding:13px 10px;
+  font-weight:800;
+  font-size:15px;
+  cursor:pointer;
+  color:#10152b;
+  background:var(--gold);
+  transition:transform .12s,opacity .12s;
+}
+button:active { transform:scale(.97); }
+button:disabled { opacity:.38; cursor:not-allowed; }
+.actions {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
   gap:10px;
-  margin:26px 0 13px;
+  margin-top:15px;
 }
-
-.section-title h2 {
-  margin:0;
-  font-size:21px;
+.attack { background:#ff7187; }
+.dodge { background:#78dfff; }
+.heal { background:#70f0a8; }
+.secondary { background:#c3b3ff; }
+.panel { margin-top:14px; }
+.panel h2 { margin:0 0 12px; font-size:18px; }
+.stages {
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:7px;
 }
-
-.section-title span {
-  color:var(--muted);
+.stagebox {
+  padding:10px 2px;
+  text-align:center;
+  background:#0d1328;
+  border:1px solid #34416d;
+  border-radius:10px;
   font-size:12px;
 }
-
-.items {
-  display:grid;
-  gap:11px;
-}
-
-.item {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  background:#111c35;
-  border:1px solid #283958;
-  border-radius:16px;
-  padding:13px;
-}
-
-.item-icon {
-  width:49px;
-  height:49px;
-  flex-shrink:0;
-  display:grid;
-  place-items:center;
-  border-radius:14px;
-  background:#25345a;
-  font-size:27px;
-}
-
-.item-info { flex:1; min-width:0; }
-
-.item-info strong {
-  display:block;
+.stagebox.active { border-color:var(--cyan); color:var(--cyan); }
+.stagebox.done { border-color:var(--green); color:var(--green); }
+#log {
+  min-height:55px;
+  line-height:1.55;
+  color:#d8e2ff;
   font-size:14px;
 }
-
-.item-info small {
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.5;
-}
-
-.item button {
-  flex-shrink:0;
-  border:0;
-  border-radius:11px;
-  padding:10px 12px;
-  background:linear-gradient(135deg,#40d9f4,#7785ff);
-  color:#071326;
-  font-size:12px;
-  font-weight:900;
-}
-
-.item button:disabled {
-  background:#293550;
-  color:#8997b5;
-  cursor:not-allowed;
-}
-
-.quest {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:13px;
-  border-radius:15px;
-  background:#111c35;
-  border:1px solid #283958;
-  margin-bottom:10px;
-}
-
-.quest-icon { font-size:26px; }
-
-.quest-info { flex:1; min-width:0; }
-
-.quest-info strong {
-  font-size:13px;
-  display:block;
-}
-
-.quest-info small {
-  font-size:12px;
-  color:var(--muted);
-}
-
-.quest-status {
-  color:var(--green);
-  font-size:12px;
-  font-weight:800;
-  text-align:right;
-}
-
-footer {
-  text-align:center;
-  color:#8391b0;
-  font-size:12px;
-  line-height:1.8;
-  padding:25px 10px 35px;
-}
-
-footer a {
-  color:var(--cyan);
-  text-decoration:none;
-  margin:0 6px;
-}
-
 .notice {
+  padding:12px;
+  border-radius:12px;
+  background:#10172e;
+  color:#b9c7eb;
+  font-size:13px;
+  line-height:1.6;
+}
+#overlay {
   display:none;
   position:fixed;
-  left:50%;
-  bottom:20px;
-  transform:translateX(-50%);
-  width:max-content;
-  max-width:90%;
-  background:#1c2949;
-  border:1px solid #526894;
-  color:white;
-  padding:12px 18px;
-  border-radius:14px;
-  z-index:20;
-  box-shadow:0 10px 35px #0008;
-  font-size:13px;
+  inset:0;
+  z-index:5;
+  background:#050817ee;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
 }
-
-.notice.show { display:block; }
-
-@keyframes float {
-  0%,100% { transform:translateY(0); }
-  50% { transform:translateY(-7px); }
+.modal {
+  width:min(420px,100%);
+  background:#171f3d;
+  border:1px solid #6276ad;
+  border-radius:22px;
+  padding:25px;
+  text-align:center;
 }
-
-.crystal { animation:float 2.5s ease-in-out infinite; }
-
-@media(max-width:720px) {
-  .game-layout { grid-template-columns:1fr; }
-  .hero { padding:26px 13px 20px; }
-  .card { padding:17px; }
-  .crystal-stage { min-height:215px; }
-  .crystal-button { width:170px; height:170px; }
-  .crystal { font-size:100px; }
-}
-
-@media(max-width:380px) {
-  .item { gap:8px; padding:10px; }
-  .item-icon { width:40px; height:40px; font-size:23px; }
-  .item button { padding:9px; }
-  .stats { gap:6px; }
-  .stat { padding:12px 4px; }
-}
-
-@media(prefers-reduced-motion:reduce) {
-  *,*::before,*::after {
-    animation:none !important;
-    transition:none !important;
-  }
+.modal h2 { color:var(--gold); }
+.modal p { line-height:1.6; color:#d3dcf6; }
+.modal button { width:100%; margin-top:10px; }
+footer { text-align:center; color:#8998c4; padding:20px; font-size:12px; }
+@media(max-width:360px) {
+  .stat { padding:10px 3px; }
+  .stat strong { font-size:17px; }
+  button { font-size:13px; }
 }
 </style>
 </head>
-
 <body>
-<div class="container">
 
 <header>
-  <div class="logo">💎 DIAMOND<span>QUEST</span></div>
-  <div class="level-badge">⭐ LEVEL <span id="level">1</span></div>
+  <h1>💎 DIAMOND QUEST</h1>
+  <div class="subtitle">Adventure • Battle • Collect</div>
 </header>
 
-<main>
-<section class="hero">
-  <div class="eyebrow">Your adventure begins</div>
-  <h1>Crystal Adventure</h1>
-  <p class="subtitle">
-    Discover magical crystals, upgrade your equipment
-    and become a legendary treasure hunter.
-  </p>
+<main class="container">
 
-  <div class="stats">
+  <section class="stats">
     <div class="stat">
-      <div class="value">💎 <span id="diamonds">0</span></div>
-      <div class="label">Diamonds</div>
+      <small>❤️ Health</small>
+      <strong id="healthText" class="health">100 / 100</strong>
     </div>
     <div class="stat">
-      <div class="value">⚡ <span id="power">1</span></div>
-      <div class="label">Power per tap</div>
+      <small>💎 Diamonds</small>
+      <strong id="diamondText" class="gold">0</strong>
     </div>
     <div class="stat">
-      <div class="value">🏆 <span id="total">0</span></div>
-      <div class="label">Total collected</div>
-    </div>
-  </div>
-</section>
-
-<div class="game-layout">
-  <section class="card">
-    <h2>✨ Crystal Mine</h2>
-    <p class="description">
-      Tap the magical crystal to collect diamonds.
-      Each upgrade makes every tap more powerful.
-    </p>
-
-    <div class="crystal-stage">
-      <button class="crystal-button" id="mineButton"
-              aria-label="Collect diamonds from the crystal">
-        <span class="crystal">💎</span>
-      </button>
-    </div>
-
-    <p class="tap-hint">TAP THE CRYSTAL TO COLLECT DIAMONDS</p>
-
-    <button id="watchVideoButton" type="button"
-      style="display:block;width:100%;margin-top:16px;padding:14px;border:1px solid #42e8ff;border-radius:14px;background:linear-gradient(135deg,#182d52,#30235b);color:#fff;font-weight:800;">
-      📺 Watch Video
-    </button>
-    <p style="color:#9baacc;font-size:12px;text-align:center;margin:8px 0 0;">
-      Video ads will be available when an ad provider is connected.
-    </p>
-
-    <div class="progress-info">
-      <span>Next level progress</span>
-      <span id="progressText">0 / 100</span>
-    </div>
-    <div class="progress-track">
-      <div class="progress-fill" id="progressFill"></div>
+      <small>🏆 Stage</small>
+      <strong id="stageText" class="stage">1 / 5</strong>
     </div>
   </section>
 
-  <section class="card">
-    <h2>⚔️ Equipment Shop</h2>
-    <p class="description">
-      Spend your collected diamonds to increase your mining power.
-    </p>
+  <section class="arena">
+    <div class="muted" id="location">THE ENCHANTED FOREST</div>
+    <div class="scene" id="scene">🌲</div>
+    <div class="enemy" id="enemyEmoji">👹</div>
+    <div class="enemy-name" id="enemyName">Forest Goblin</div>
 
-    <div class="items">
-      <div class="item">
-        <div class="item-icon">⚔️</div>
-        <div class="item-info">
-          <strong>Crystal Sword</strong>
-          <small>+1 power per tap</small>
-          <small>Owned: <span id="swordOwned">0</span></small>
-        </div>
-        <button id="buySword">💎 <span id="swordCost">25</span></button>
-      </div>
+    <div class="muted">Enemy health</div>
+    <div class="bar"><div id="enemyBar"></div></div>
+    <div id="enemyHealthText" class="muted">40 / 40 HP</div>
 
-      <div class="item">
-        <div class="item-icon">🛡️</div>
-        <div class="item-info">
-          <strong>Magic Shield</strong>
-          <small>+5 bonus diamonds per tap</small>
-          <small>Owned: <span id="shieldOwned">0</span></small>
-        </div>
-        <button id="buyShield">💎 <span id="shieldCost">100</span></button>
-      </div>
+    <div style="margin-top:18px" class="muted">Your health</div>
+    <div class="bar playerbar"><div id="playerBar"></div></div>
 
-      <div class="item">
-        <div class="item-icon">🧪</div>
-        <div class="item-info">
-          <strong>Power Potion</strong>
-          <small>+10 power per tap</small>
-          <small>Owned: <span id="potionOwned">0</span></small>
-        </div>
-        <button id="buyPotion">💎 <span id="potionCost">250</span></button>
-      </div>
+    <div class="actions">
+      <button class="attack" id="attackBtn" onclick="attack()">⚔️ Attack</button>
+      <button class="dodge" id="dodgeBtn" onclick="dodge()">💨 Dodge</button>
+      <button class="heal" id="healBtn" onclick="heal()">💚 Heal · 5 💎</button>
+      <button class="secondary" id="saveBtn" onclick="saveGame()">💾 Save Game</button>
     </div>
   </section>
-</div>
 
-<section class="card">
-  <div class="section-title">
-    <h2>🎯 Daily Challenges</h2>
-    <span>Collect rewards by playing</span>
-  </div>
+  <section class="panel">
+    <h2>🗺️ Your Adventure</h2>
+    <div class="stages" id="stages"></div>
+    <p class="muted" id="progressText">Defeat the enemy to unlock the next stage.</p>
+  </section>
 
-  <div class="quest">
-    <div class="quest-icon">💠</div>
-    <div class="quest-info">
-      <strong>First Discovery</strong>
-      <small>Collect 10 diamonds in total</small>
+  <section class="panel">
+    <h2>📜 Battle Log</h2>
+    <div id="log" aria-live="polite">Your adventure begins! Defeat the monster to earn diamonds.</div>
+  </section>
+
+  <section class="panel">
+    <h2>🎁 Rewards & Rules</h2>
+    <div class="notice">
+      • Defeat an enemy to earn diamonds.<br>
+      • Each stage becomes more difficult.<br>
+      • Healing costs 5 diamonds and restores 25 health.<br>
+      • If your health reaches zero, the game ends.<br>
+      • This is a game reward only. It is not real money.<br>
+      • Video ads are not connected yet.
     </div>
-    <div class="quest-status" id="quest1">0 / 10</div>
-  </div>
-
-  <div class="quest">
-    <div class="quest-icon">⛏️</div>
-    <div class="quest-info">
-      <strong>Dedicated Miner</strong>
-      <small>Collect 100 diamonds in total</small>
-    </div>
-    <div class="quest-status" id="quest2">0 / 100</div>
-  </div>
-
-  <div class="quest">
-    <div class="quest-icon">👑</div>
-    <div class="quest-info">
-      <strong>Crystal Legend</strong>
-      <small>Reach level 5</small>
-    </div>
-    <div class="quest-status" id="quest3">Level 1 / 5</div>
-  </div>
-</section>
+  </section>
 
 </main>
 
-<footer>
-  <div>💎 Diamond Quest — Your journey, your legend.</div>
-  <div>Game progress is saved on this device.</div>
-  <div>
-    <a href="#about">About</a>
-    <a href="privacy.html">Privacy Policy</a>
+<div id="overlay">
+  <div class="modal">
+    <div id="modalEmoji" style="font-size:60px">🏆</div>
+    <h2 id="modalTitle">Stage Complete!</h2>
+    <p id="modalMessage"></p>
+    <button id="modalBtn" onclick="modalAction()">Continue</button>
   </div>
-  <p id="about">A casual crystal-collecting game for entertainment.</p>
-</footer>
-
 </div>
 
-<div class="notice" id="notice" role="status" aria-live="polite"></div>
+<footer>Diamond Quest © 2026 · Adventure Mode</footer>
 
 <script>
-(function () {
-  "use strict";
+"use strict";
 
-  const SAVE_KEY = "diamondQuestSaveV2";
+const levels = [
+  {name:"Forest Goblin", emoji:"👹", scene:"🌲", place:"THE ENCHANTED FOREST", hp:40, damage:12, reward:10},
+  {name:"Cave Troll", emoji:"🧌", scene:"🪨", place:"THE DARK CAVE", hp:65, damage:17, reward:15},
+  {name:"Fire Dragon", emoji:"🐉", scene:"🌋", place:"THE VOLCANO", hp:95, damage:22, reward:20},
+  {name:"Shadow Knight", emoji:"💀", scene:"🏰", place:"THE HAUNTED CASTLE", hp:125, damage:27, reward:30},
+  {name:"Crystal Guardian", emoji:"🐲", scene:"💎", place:"THE CRYSTAL TEMPLE", hp:165, damage:32, reward:50}
+];
 
-  const defaults = {
-    diamonds: 0,
-    total: 0,
-    sword: 0,
-    shield: 0,
-    potion: 0
-  };
+const $ = id => document.getElementById(id);
 
-  let state = { ...defaults };
+let game = {
+  stage:0,
+  hp:100,
+  diamonds:0,
+  enemyHP:levels[0].hp,
+  power:15,
+  dodgeReady:false,
+  over:false,
+  won:false,
+  completed:[],
+  turn:0
+};
 
+function log(message) {
+  $("log").textContent = message;
+}
+
+function persist() {
   try {
-    const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
-    if (saved && typeof saved === "object") {
-      for (const key of Object.keys(defaults)) {
-        if (Number.isFinite(saved[key]) && saved[key] >= 0) {
-          state[key] = Math.floor(saved[key]);
-        }
-      }
+    localStorage.setItem("diamondQuestAdventureV2", JSON.stringify(game));
+  } catch(e) {}
+}
+
+function saveGame() {
+  persist();
+  log("Game saved on this device!");
+}
+
+function loadGame() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("diamondQuestAdventureV2"));
+    if (!saved || !Array.isArray(saved.completed)) return;
+
+    if (saved.stage < 0 || saved.stage >= levels.length ||
+        !Number.isFinite(saved.hp) || !Number.isFinite(saved.diamonds) ||
+        !Number.isFinite(saved.enemyHP)) return;
+
+    game = {...game, ...saved};
+    game.hp = Math.max(0, Math.min(100, game.hp));
+    game.diamonds = Math.max(0, game.diamonds);
+    game.power = Math.max(1, Math.min(100, game.power));
+    game.completed = game.completed.filter(n =>
+      Number.isInteger(n) && n >= 0 && n < levels.length
+    );
+
+    if (game.hp <= 0) game.over = true;
+    if (game.completed.length === levels.length) game.won = true;
+    if (!game.over && !game.won) {
+      game.enemyHP = Math.max(1, Math.min(levels[game.stage].hp, game.enemyHP));
     }
-  } catch (error) {
-    console.warn("Saved game could not be loaded.");
+  } catch(e) {}
+}
+
+function renderStages() {
+  $("stages").innerHTML = levels.map((level,i) => {
+    let cls = game.completed.includes(i) ? "done" :
+      (i === game.stage && !game.over && !game.won ? "active" : "");
+    let icon = game.completed.includes(i) ? "✅" : level.emoji;
+    return `<div class="stagebox ${cls}">${i+1}<br>${icon}</div>`;
+  }).join("");
+}
+
+function render() {
+  const level = levels[game.stage];
+  $("healthText").textContent = game.hp + " / 100";
+  $("diamondText").textContent = game.diamonds;
+  $("stageText").textContent = game.won ? "5 / 5" : (game.stage+1)+" / 5";
+  $("location").textContent = level.place;
+  $("scene").textContent = level.scene;
+  $("enemyEmoji").textContent = level.emoji;
+  $("enemyName").textContent = level.name;
+  $("enemyHealthText").textContent = Math.max(0,game.enemyHP)+" / "+level.hp+" HP";
+  $("enemyBar").style.width = Math.max(0,game.enemyHP/level.hp*100)+"%";
+  $("playerBar").style.width = game.hp+"%";
+  $("progressText").textContent = game.completed.length+
+    " of 5 stages completed. Defeat each enemy to advance.";
+
+  const disabled = game.over || game.won;
+  ["attackBtn","dodgeBtn","healBtn"].forEach(id => $(id).disabled=disabled);
+  $("healBtn").textContent = game.hp >= 100 ? "💚 Health Full" : "💚 Heal · 5 💎";
+  $("healBtn").disabled = disabled || game.hp >= 100 || game.diamonds < 5;
+  renderStages();
+}
+
+function enemyTurn() {
+  if (game.enemyHP <= 0 || game.over || game.won) return;
+
+  if (game.dodgeReady) {
+    game.dodgeReady = false;
+    log("Great dodge! The enemy missed. Your turn!");
+    return;
   }
 
-  const $ = id => document.getElementById(id);
-  let noticeTimer;
+  const damage = levels[game.stage].damage;
+  game.hp = Math.max(0, game.hp-damage);
 
-  function levelFromTotal(total) {
-    return Math.floor(Math.sqrt(total / 100)) + 1;
-  }
-
-  function power() {
-    return 1 + state.sword + state.potion * 10 + state.shield * 5;
-  }
-
-  function swordCost() {
-    return Math.floor(25 * Math.pow(1.65, state.sword));
-  }
-
-  function shieldCost() {
-    return Math.floor(100 * Math.pow(1.8, state.shield));
-  }
-
-  function potionCost() {
-    return Math.floor(250 * Math.pow(2, state.potion));
-  }
-
-  function formatNumber(n) {
-    return Math.floor(n).toLocaleString("en-US");
-  }
-
-  function save() {
-    try {
-      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-    } catch (error) {
-      showNotice("Unable to save progress on this device.");
-    }
-  }
-
-  function showNotice(message) {
-    const box = $("notice");
-    box.textContent = message;
-    box.classList.add("show");
-    clearTimeout(noticeTimer);
-    noticeTimer = setTimeout(() => box.classList.remove("show"), 2200);
-  }
-
-  function render() {
-    const level = levelFromTotal(state.total);
-    const currentLevelStart = Math.pow(level - 1, 2) * 100;
-    const nextLevelAt = Math.pow(level, 2) * 100;
-    const progress = state.total - currentLevelStart;
-    const needed = nextLevelAt - currentLevelStart;
-
-    $("diamonds").textContent = formatNumber(state.diamonds);
-    $("total").textContent = formatNumber(state.total);
-    $("power").textContent = formatNumber(power());
-    $("level").textContent = formatNumber(level);
-
-    $("swordOwned").textContent = state.sword;
-    $("shieldOwned").textContent = state.shield;
-    $("potionOwned").textContent = state.potion;
-
-    $("swordCost").textContent = formatNumber(swordCost());
-    $("shieldCost").textContent = formatNumber(shieldCost());
-    $("potionCost").textContent = formatNumber(potionCost());
-
-    $("buySword").disabled = state.diamonds < swordCost();
-    $("buyShield").disabled = state.diamonds < shieldCost();
-    $("buyPotion").disabled = state.diamonds < potionCost();
-
-    $("progressText").textContent =
-      formatNumber(progress) + " / " + formatNumber(needed);
-    $("progressFill").style.width =
-      Math.min(100, (progress / needed) * 100) + "%";
-
-    $("quest1").textContent =
-      state.total >= 10 ? "✓ Complete" : formatNumber(state.total) + " / 10";
-    $("quest2").textContent =
-      state.total >= 100 ? "✓ Complete" : formatNumber(state.total) + " / 100";
-    $("quest3").textContent =
-      level >= 5 ? "✓ Complete" : "Level " + level + " / 5";
-  }
-
-  function collect() {
-    const amount = power();
-
-    state.diamonds += amount;
-    state.total += amount;
-
-    save();
+  if (game.hp <= 0) {
+    game.over = true;
+    log("You have been defeated. Try again!");
     render();
-
-    if (state.total === amount) {
-      showNotice("✨ Your adventure has started!");
-    } else {
-      showNotice("+" + formatNumber(amount) + " 💎 diamonds!");
-    }
+    persist();
+    showModal("💀","Game Over","Your adventure has ended. Start a new game and try a different strategy.","Restart");
+    return;
   }
 
-  function purchase(type, costFunction, message) {
-    const cost = costFunction();
+  log("The enemy attacked! You lost "+damage+" health.");
+}
 
-    if (state.diamonds < cost) {
-      showNotice("Not enough diamonds yet. Keep mining!");
+function attack() {
+  if (game.over || game.won) return;
+
+  game.turn++;
+  const damage = game.power + Math.floor(Math.random()*6);
+  game.enemyHP = Math.max(0,game.enemyHP-damage);
+
+  if (game.enemyHP <= 0) {
+    const level = levels[game.stage];
+    game.diamonds += level.reward;
+    game.completed.push(game.stage);
+    log("Victory! You defeated "+level.name+" and earned "+level.reward+" diamonds!");
+
+    if (game.stage === levels.length-1) {
+      game.won = true;
+      render();
+      persist();
+      showModal("🏆","Quest Completed!","You defeated all five enemies and collected your rewards. Excellent adventure!","Play Again");
       return;
     }
 
-    state.diamonds -= cost;
-    state[type] += 1;
-
-    save();
     render();
-    showNotice(message);
+    persist();
+    showModal("🎉","Stage Complete!","You earned "+level.reward+" diamonds. Get ready for the next challenge!","Next Stage");
+    return;
   }
 
-  $("mineButton").addEventListener("click", collect);
-
-  $("watchVideoButton").addEventListener("click", () => {
-    showNotice("Video ads are not connected yet.");
-  });
-
-  $("buySword").addEventListener("click", () => {
-    purchase("sword", swordCost, "⚔️ Crystal Sword upgraded!");
-  });
-
-  $("buyShield").addEventListener("click", () => {
-    purchase("shield", shieldCost, "🛡️ Magic Shield upgraded!");
-  });
-
-  $("buyPotion").addEventListener("click", () => {
-    purchase("potion", potionCost, "🧪 Power Potion activated!");
-  });
-
+  enemyTurn();
   render();
-})();
+  persist();
+}
+
+function dodge() {
+  if (game.over || game.won) return;
+  game.dodgeReady = true;
+  log("You prepare to dodge the next attack. Now strike!");
+  render();
+  persist();
+}
+
+function heal() {
+  if (game.over || game.won || game.hp >= 100 || game.diamonds < 5) return;
+  game.diamonds -= 5;
+  const before = game.hp;
+  game.hp = Math.min(100,game.hp+25);
+  log("You restored "+(game.hp-before)+" health. Diamonds spent: 5.");
+  enemyTurn();
+  render();
+  persist();
+}
+
+function showModal(emoji,title,message,button) {
+  $("modalEmoji").textContent=emoji;
+  $("modalTitle").textContent=title;
+  $("modalMessage").textContent=message;
+  $("modalBtn").textContent=button;
+  $("overlay").style.display="flex";
+}
+
+function modalAction() {
+  $("overlay").style.display="none";
+
+  if (game.over || game.won) {
+    resetGame();
+    return;
+  }
+
+  if (game.stage < levels.length-1 && game.completed.includes(game.stage)) {
+    game.stage++;
+    game.enemyHP=levels[game.stage].hp;
+    game.hp=Math.min(100,game.hp+15);
+    game.dodgeReady=false;
+    log("Entering "+levels[game.stage].place+"! Your health recovered by 15.");
+    render();
+    persist();
+  }
+}
+
+function resetGame() {
+  game = {
+    stage:0,
+    hp:100,
+    diamonds:0,
+    enemyHP:levels[0].hp,
+    power:15,
+    dodgeReady:false,
+    over:false,
+    won:false,
+    completed:[],
+    turn:0
+  };
+  $("overlay").style.display="none";
+  log("A new adventure begins! Defeat the Forest Goblin.");
+  render();
+  persist();
+}
+
+loadGame();
+if (game.over) {
+  showModal("💀","Game Over","Your saved game has ended. Start a new adventure!","Restart");
+} else if (game.won) {
+  showModal("🏆","Quest Completed!","You completed every stage! Play again?","Play Again");
+}
+render();
 </script>
 </body>
 </html>
