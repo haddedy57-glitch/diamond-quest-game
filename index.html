@@ -215,6 +215,17 @@ footer { text-align:center; color:#8998c4; padding:20px; font-size:12px; }
     </div>
   </section>
 
+
+  <section class="panel" id="videoRewardPanel">
+    <h2>🎬 Watch Video & Earn Diamonds</h2>
+    <p class="muted">Watch a supported rewarded ad to earn bonus diamonds.</p>
+    <button id="watchVideoBtn" style="width:100%;background:#70f0a8"
+      onclick="watchRewardVideo()">▶️ Watch Video</button>
+    <p id="videoAdMessage" class="muted" aria-live="polite">
+      Rewarded video ads are not connected yet.
+    </p>
+  </section>
+
   <section class="panel">
     <h2>🗺️ Your Adventure</h2>
     <div class="stages" id="stages"></div>
@@ -448,6 +459,13 @@ function modalAction() {
     render();
     persist();
   }
+}
+
+
+function watchRewardVideo() {
+  const message = document.getElementById("videoAdMessage");
+  message.textContent =
+    "Rewarded video ads are not connected yet. No ad played and no diamonds were added.";
 }
 
 function resetGame() {
