@@ -473,6 +473,14 @@ footer a {
 
     <p class="tap-hint">TAP THE CRYSTAL TO COLLECT DIAMONDS</p>
 
+    <button id="watchVideoButton" type="button"
+      style="display:block;width:100%;margin-top:16px;padding:14px;border:1px solid #42e8ff;border-radius:14px;background:linear-gradient(135deg,#182d52,#30235b);color:#fff;font-weight:800;">
+      📺 Watch Video
+    </button>
+    <p style="color:#9baacc;font-size:12px;text-align:center;margin:8px 0 0;">
+      Video ads will be available when an ad provider is connected.
+    </p>
+
     <div class="progress-info">
       <span>Next level progress</span>
       <span id="progressText">0 / 100</span>
@@ -714,6 +722,10 @@ footer a {
   }
 
   $("mineButton").addEventListener("click", collect);
+
+  $("watchVideoButton").addEventListener("click", () => {
+    showNotice("Video ads are not connected yet.");
+  });
 
   $("buySword").addEventListener("click", () => {
     purchase("sword", swordCost, "⚔️ Crystal Sword upgraded!");
