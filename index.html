@@ -245,5 +245,39 @@ addEventListener('resize',()=>{
 document.getElementById('loading').style.display='none';
 updateUI();
 </script>
+
+<style>
+#rewardVideoButton {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  padding: 13px 20px;
+  border: 2px solid #ffe58a;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  color: white;
+  font-size: 16px;
+  font-weight: 800;
+  box-shadow: 0 5px 20px #0006;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#rewardVideoButton:active {
+  transform: translateX(-50%) scale(.96);
+}
+</style>
+
+<button id="rewardVideoButton" type="button">
+  🎬 Watch Video · +10 💎
+</button>
+
+<script>
+document.getElementById("rewardVideoButton").addEventListener("click", function () {
+  alert("Rewarded video ads are not connected yet. Your Diamonds have not changed.");
+});
+</script>
+
 </body>
 </html>
