@@ -162,6 +162,68 @@ button:disabled { opacity:.42;cursor:not-allowed; }
   .buildbtn { min-height:88px; }
 }
 
+
+/* MOBILE POLISH UPGRADE V1 */
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    transform .16s ease,
+    filter .16s ease,
+    box-shadow .16s ease;
+}
+
+button:active:not(:disabled) {
+  transform: scale(.96);
+  filter: brightness(1.16);
+}
+
+button:focus-visible {
+  outline: 2px solid #80eaff;
+  outline-offset: 3px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: .58;
+}
+
+.panel {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+@media (max-width: 600px) {
+  .panel {
+    max-width: calc(100vw - 24px);
+    box-sizing: border-box;
+  }
+
+  button {
+    min-height: 38px;
+  }
+
+  #expansion-menu {
+    right: 12px !important;
+    bottom: 100px !important;
+    width: min(190px, calc(100vw - 90px)) !important;
+  }
+
+  #daily-quest-panel {
+    max-width: calc(100vw - 24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+
+  button:active:not(:disabled) {
+    transform: none;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -513,7 +575,7 @@ function placeBuilding(type,x,z){
   toast('Not enough cash! Build more income first.');
   return;
  }
- if(Math.hypot(x,z)>6.35){
+ if(!isBuildablePosition(x,z)){
   toast('Choose a location inside the island.');
   return;
  }
@@ -575,7 +637,7 @@ function loadGame(){
   data.buildings.forEach(item=>{
    if(!buildingTypes[item.type])return;
    if(!Number.isFinite(item.x)||!Number.isFinite(item.z))return;
-   if(Math.hypot(item.x,item.z)>6.35)return;
+   if(!isBuildablePosition(item.x,item.z))return;
    const b=makeBuilding(item.type,item.x,item.z);
    b.userData.level=Math.max(1,Math.floor(item.level||1));
    b.userData.income=Math.max(buildingTypes[item.type].income,
@@ -622,7 +684,7 @@ let pinchDistance=0;
 
 function updateCamera(){
  cameraPhi=Math.max(.25,Math.min(1.35,cameraPhi));
- cameraRadius=Math.max(12,Math.min(38,cameraRadius));
+ cameraRadius=Math.max(12,Math.min(48,cameraRadius));
  camera.position.set(
   Math.sin(cameraTheta)*Math.cos(cameraPhi)*cameraRadius,
   Math.sin(cameraPhi)*cameraRadius,
@@ -664,7 +726,7 @@ function pointerUp(event){
    toast(b.userData.displayName+' selected');
   }else{
    const p=getGroundPoint(event);
-   if(p && Math.hypot(p.x,p.z)<6.35){
+   if(p && isBuildablePosition(p.x,p.z)){
     placeBuilding(chosenType,p.x,p.z);
    }else{
     selectBuilding(null);
@@ -853,6 +915,7 @@ function silentAutoSave(){
     const data={
       cash,level,bonusClaimed,
       milestoneFiveClaimed,milestoneEightClaimed,
+      unlockedZones:[...unlockedZones],
       buildings:buildings.map(b=>({
         type:b.userData.buildingType,
         x:b.position.x,z:b.position.z,
@@ -908,10 +971,89 @@ document.addEventListener('visibilitychange',()=>{
 const expansionZones = [
   {id:"east",name:"East Beach",price:1200,x:10,z:0,color:0xe9d19b},
   {id:"west",name:"West Cove",price:2200,x:-10,z:0,color:0xe9d19b},
-  {id:"north",name:"North Resort",price:4000,x:0,z:-10,color:0xe9d19b}
+  {id:"north",name:"North Resort",price:4000,x:0,z:-10,color:0xe9d19b},
+  {id:"south",name:"South Paradise",price:6500,x:0,z:10,color:0xe9d19b},
+  {id:"far-east",name:"Crystal Island",price:10000,x:18,z:0,color:0xe9d19b},
+  {id:"far-west",name:"Sunset Island",price:15000,x:-18,z:0,color:0xe9d19b}
 ];
 
 const unlockedZones = new Set(["main"]);
+
+/* BUILDABLE AREAS: MAIN ISLAND + UNLOCKED ISLANDS */
+function isBuildablePosition(x,z){
+  if(!Number.isFinite(x)||!Number.isFinite(z)) return false;
+  if(Math.hypot(x,z)<=6.35) return true;
+
+  return expansionZones.some(zone =>
+    unlockedZones.has(zone.id) &&
+    Math.hypot(x-zone.x,z-zone.z)<=3.45
+  );
+}
+
+/* EXPANSION SAVE RESTORE FIX */
+function createExpansionZone(zone){
+  if(zone.mesh) return;
+
+  const pad=mesh(
+    new THREE.CylinderGeometry(4.4,4.8,.32,48),
+    sand,island,zone.x,-.02,zone.z
+  );
+  const field=mesh(
+    new THREE.CylinderGeometry(4,4.3,.12,48),
+    grass,island,zone.x,.20,zone.z
+  );
+  const bridge=mesh(
+    new THREE.BoxGeometry(3,.12,1.1),
+    mat(0x96623a),island,zone.x/2,.97,zone.z/2
+  );
+
+  for(let i=0;i<3;i++){
+    const px=zone.x+(i-1)*1.5;
+    palm(px,zone.z+2.7,.8);
+  }
+
+  zone.mesh=pad;
+  zone.field=field;
+  zone.bridge=bridge;
+}
+
+const expansionOriginalSaveGame=saveGame;
+saveGame=function(){
+  expansionOriginalSaveGame();
+  try{
+    const key="islandTycoonSaveV1";
+    const data=JSON.parse(localStorage.getItem(key)||"{}");
+    data.unlockedZones=[...unlockedZones];
+    localStorage.setItem(key,JSON.stringify(data));
+  }catch(e){
+    console.warn("Expansion progress could not be saved.");
+  }
+};
+
+const expansionOriginalLoadGame=loadGame;
+loadGame=function(){
+  expansionOriginalLoadGame();
+  try{
+    const data=JSON.parse(
+      localStorage.getItem("islandTycoonSaveV1")||"null"
+    );
+    if(!data || !Array.isArray(data.unlockedZones)) return;
+
+    data.unlockedZones.forEach(id=>{
+      if(id==="main"){
+        unlockedZones.add("main");
+        return;
+      }
+      const zone=expansionZones.find(item=>item.id===id);
+      if(zone && !unlockedZones.has(id)){
+        unlockedZones.add(id);
+        createExpansionZone(zone);
+      }
+    });
+  }catch(e){
+    console.warn("Expansion progress could not be restored.");
+  }
+};
 const expansionButtons = document.createElement("div");
 expansionButtons.id = "expansion-menu";
 expansionButtons.className = "panel";
@@ -955,28 +1097,7 @@ function renderExpansionOptions(){
       cash-=zone.price;
       unlockedZones.add(zone.id);
 
-      const pad=mesh(
-        new THREE.CylinderGeometry(4.4,4.8,.32,48),
-        sand,island,zone.x,-.02,zone.z
-      );
-      const field=mesh(
-        new THREE.CylinderGeometry(4,4.3,.12,48),
-        grass,island,zone.x,.20,zone.z
-      );
-
-      const bridge=mesh(
-        new THREE.BoxGeometry(3,.12,1.1),
-        mat(0x96623a),island,zone.x/2,.97,zone.z/2
-      );
-
-      for(let i=0;i<3;i++){
-        const px=zone.x+(i-1)*1.5;
-        palm(px,zone.z+2.7,.8);
-      }
-
-      zone.mesh=pad;
-      zone.field=field;
-      zone.bridge=bridge;
+      createExpansionZone(zone);
       renderExpansionOptions();
       updateUI();
       saveGame();
