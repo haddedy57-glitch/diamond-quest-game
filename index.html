@@ -903,6 +903,224 @@ document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden')silentAutoSave();
 });
 
+
+/* ISLAND EXPANSION SYSTEM */
+const expansionZones = [
+  {id:"east",name:"East Beach",price:1200,x:10,z:0,color:0xe9d19b},
+  {id:"west",name:"West Cove",price:2200,x:-10,z:0,color:0xe9d19b},
+  {id:"north",name:"North Resort",price:4000,x:0,z:-10,color:0xe9d19b}
+];
+
+const unlockedZones = new Set(["main"]);
+const expansionButtons = document.createElement("div");
+expansionButtons.id = "expansion-menu";
+expansionButtons.className = "panel";
+expansionButtons.style.cssText =
+ "position:absolute;right:68px;bottom:165px;width:190px;padding:12px;" +
+ "display:none;pointer-events:auto;z-index:5";
+expansionButtons.innerHTML =
+ '<div style="font-weight:bold;margin-bottom:8px">🗺️ Expand Island</div>' +
+ '<div id="expansion-options"></div>';
+document.getElementById("hud").appendChild(expansionButtons);
+
+const expansionToggle = document.createElement("button");
+expansionToggle.textContent = "🗺️";
+expansionToggle.title = "Island expansion";
+document.getElementById("righttools").appendChild(expansionToggle);
+expansionToggle.addEventListener("click",()=>{
+  expansionButtons.style.display =
+    expansionButtons.style.display === "none" ? "block" : "none";
+});
+
+function renderExpansionOptions(){
+  const options=document.getElementById("expansion-options");
+  options.replaceChildren();
+
+  expansionZones.forEach(zone=>{
+    const btn=document.createElement("button");
+    btn.style.cssText="width:100%;margin:4px 0;font-size:11px";
+    btn.textContent=unlockedZones.has(zone.id)
+      ? "✓ "+zone.name
+      : zone.name+" · $"+zone.price;
+
+    btn.disabled=unlockedZones.has(zone.id) || cash<zone.price;
+
+    btn.addEventListener("click",()=>{
+      if(unlockedZones.has(zone.id))return;
+      if(cash<zone.price){
+        toast("Not enough cash to expand.");
+        return;
+      }
+
+      cash-=zone.price;
+      unlockedZones.add(zone.id);
+
+      const pad=mesh(
+        new THREE.CylinderGeometry(4.4,4.8,.32,48),
+        sand,island,zone.x,-.02,zone.z
+      );
+      const field=mesh(
+        new THREE.CylinderGeometry(4,4.3,.12,48),
+        grass,island,zone.x,.20,zone.z
+      );
+
+      const bridge=mesh(
+        new THREE.BoxGeometry(3,.12,1.1),
+        mat(0x96623a),island,zone.x/2,.97,zone.z/2
+      );
+
+      for(let i=0;i<3;i++){
+        const px=zone.x+(i-1)*1.5;
+        palm(px,zone.z+2.7,.8);
+      }
+
+      zone.mesh=pad;
+      zone.field=field;
+      zone.bridge=bridge;
+      renderExpansionOptions();
+      updateUI();
+      saveGame();
+      toast("🏝️ "+zone.name+" unlocked!");
+    });
+
+    options.appendChild(btn);
+  });
+}
+
+const expansionOriginalUpdateUI=updateUI;
+updateUI=function(){
+  expansionOriginalUpdateUI();
+  if(typeof renderExpansionOptions==="function")renderExpansionOptions();
+};
+
+renderExpansionOptions();
+
+
+/* DAILY ISLAND QUESTS */
+const dailyQuestDate = () => {
+  const d = new Date();
+  return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+};
+
+let dailyQuestState = {
+  date: dailyQuestDate(),
+  claimed: []
+};
+
+try {
+  const saved = JSON.parse(localStorage.getItem("islandDailyQuests") || "null");
+  if(saved && saved.date === dailyQuestDate()){
+    dailyQuestState = saved;
+  }
+} catch(e) {}
+
+const dailyQuestList = [
+  {
+    id:"builder",
+    title:"🏗️ Build 3 structures",
+    reward:150,
+    check:()=>buildings.length>=3
+  },
+  {
+    id:"income",
+    title:"💰 Reach $30/s income",
+    reward:250,
+    check:()=>incomePerSecond()>=30
+  },
+  {
+    id:"expander",
+    title:"🗺️ Expand your island",
+    reward:300,
+    check:()=>typeof unlockedZones!=="undefined" &&
+      unlockedZones.size>=2
+  }
+];
+
+const questPanel = document.createElement("section");
+questPanel.className = "panel";
+questPanel.id = "daily-quest-panel";
+questPanel.style.cssText =
+  "position:absolute;left:12px;top:50%;transform:translateY(-35%);" +
+  "width:230px;max-height:42vh;overflow:auto;padding:13px;" +
+  "display:none;pointer-events:auto;z-index:6";
+questPanel.innerHTML =
+  '<div style="font-weight:800;margin-bottom:5px">📅 Daily Missions</div>'+
+  '<div style="font-size:10px;color:#aabbd0;margin-bottom:9px">Complete tasks to earn cash.</div>'+
+  '<div id="daily-quest-items"></div>';
+document.getElementById("hud").appendChild(questPanel);
+
+const questToggle = document.createElement("button");
+questToggle.textContent = "📅";
+questToggle.title = "Daily missions";
+document.getElementById("righttools").appendChild(questToggle);
+
+questToggle.addEventListener("click",()=>{
+  questPanel.style.display =
+    questPanel.style.display==="none" ? "block" : "none";
+  renderDailyQuests();
+});
+
+function saveDailyQuestState(){
+  try{
+    localStorage.setItem(
+      "islandDailyQuests",
+      JSON.stringify(dailyQuestState)
+    );
+  }catch(e){}
+}
+
+function renderDailyQuests(){
+  const list=document.getElementById("daily-quest-items");
+  if(!list)return;
+  list.replaceChildren();
+
+  dailyQuestList.forEach(q=>{
+    const complete=q.check();
+    const claimed=dailyQuestState.claimed.includes(q.id);
+    const card=document.createElement("div");
+    card.style.cssText=
+      "padding:9px 0;border-top:1px solid #ffffff18;font-size:11px";
+
+    const title=document.createElement("div");
+    title.textContent=q.title;
+    title.style.marginBottom="6px";
+
+    const status=document.createElement("div");
+    status.style.cssText="font-size:10px;color:#aabbd0;margin-bottom:6px";
+    status.textContent=claimed ? "Reward collected ✓" :
+      complete ? "Mission complete!" : "Keep playing to complete it.";
+
+    const button=document.createElement("button");
+    button.style.cssText="width:100%;font-size:11px;padding:8px";
+    button.textContent=claimed ? "Collected" : "Claim $"+q.reward;
+    button.disabled=!complete || claimed;
+
+    button.addEventListener("click",()=>{
+      if(!q.check() || dailyQuestState.claimed.includes(q.id))return;
+      cash+=q.reward;
+      dailyQuestState.claimed.push(q.id);
+      saveDailyQuestState();
+      updateUI();
+      renderDailyQuests();
+      toast("🎁 Daily mission reward: +$"+q.reward);
+      saveGame();
+    });
+
+    card.append(title,status,button);
+    list.appendChild(card);
+  });
+}
+
+// Refresh mission progress whenever the game updates.
+const dailyQuestPreviousUpdateUI = updateUI;
+updateUI = function(){
+  dailyQuestPreviousUpdateUI();
+  if(typeof renderDailyQuests==="function")renderDailyQuests();
+};
+
+saveDailyQuestState();
+renderDailyQuests();
+
 function animate(){
  requestAnimationFrame(animate);
 
