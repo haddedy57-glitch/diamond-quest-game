@@ -63,6 +63,105 @@ h2{font-size:17px;margin:7px 0}
  .buildbtn b{font-size:9px}
  #hint{top:66px;font-size:10px}
 }
+
+/* PREMIUM ISLAND TYCOON VISUAL UPGRADE */
+body {
+  background: #071d2b;
+  color: #f5f8ff;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+#game canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.panel {
+  background: linear-gradient(145deg,rgba(9,32,48,.92),rgba(5,17,31,.86));
+  border: 1px solid rgba(190,230,255,.19);
+  box-shadow: 0 12px 40px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.06);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+#topbar {
+  border-radius: 19px;
+  background: linear-gradient(110deg,rgba(5,25,43,.96),rgba(15,57,72,.91));
+}
+.brand {
+  letter-spacing: 1.4px;
+  text-shadow: 0 2px 16px #25d7d055;
+}
+.brand span { color:#ffc96b; }
+.stat {
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px;
+}
+.stat b { letter-spacing:.2px; }
+#leftpanel { border-radius:19px; }
+#leftpanel h2 { letter-spacing:-.3px; }
+#buildpanel {
+  border-radius:20px;
+  background: linear-gradient(135deg,rgba(6,25,40,.96),rgba(8,38,49,.94));
+}
+.buildbtn {
+  min-height:78px;
+  border-radius:14px;
+  border-color:rgba(255,255,255,.1);
+  background:linear-gradient(150deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
+  transition:background .18s,border-color .18s,transform .18s;
+}
+.buildbtn.selected {
+  border-color:#ffd166;
+  background:linear-gradient(145deg,rgba(255,209,102,.2),rgba(255,209,102,.045));
+  box-shadow:inset 0 0 0 1px #ffd16622,0 0 18px #ffd16615;
+}
+.buildbtn b { color:#ffcf75; }
+button {
+  transition:filter .16s,transform .16s,border-color .16s;
+  touch-action:manipulation;
+}
+button:hover { filter:brightness(1.18); }
+button:focus-visible { outline:2px solid #ffd166;outline-offset:2px; }
+button:disabled { opacity:.42;cursor:not-allowed; }
+#watchbtn {
+  background:linear-gradient(120deg,#5e4bc2,#2d4f9e);
+  border:1px solid #a7a1ff66;
+  box-shadow:0 5px 20px #5642bb25;
+}
+#righttools button {
+  background:linear-gradient(145deg,rgba(11,38,55,.96),rgba(6,21,37,.94));
+  border-color:rgba(200,235,255,.2);
+  box-shadow:0 6px 20px #0002;
+}
+#selectedpanel { border-radius:17px; }
+#upgradebtn {
+  background:linear-gradient(120deg,#b7802d,#74501d);
+  border-color:#ffdb8c66;
+}
+#toast {
+  z-index:10;
+  box-shadow:0 10px 30px #0004;
+}
+#hint {
+  border-color:#c5e8ff26;
+  box-shadow:0 5px 22px #0002;
+}
+@media(max-width:600px) {
+  #topbar { border-radius:15px; }
+  #leftpanel { max-width:46vw; }
+  #buildpanel { border-radius:16px; }
+  .buildbtn { min-height:70px; }
+  .buildbtn:active { transform:scale(.96); }
+  #selectedpanel { max-width:48vw; }
+}
+@media(min-width:900px) {
+  #leftpanel { width:245px; }
+  #buildpanel { left:50%;right:auto;width:min(680px,70vw);transform:translateX(-50%); }
+  .buildbtn { min-height:88px; }
+}
+
 </style>
 </head>
 <body>
@@ -619,6 +718,191 @@ renderer.domElement.addEventListener('wheel',event=>{
 },{passive:true});
 window.addEventListener('resize',resize);
 
+
+/* LUXURY ISLAND SCENE ADDITIONS */
+const luxuryProps = [];
+let luxuryBoat = null;
+
+function setupLuxuryScene() {
+  const wood = mat(0x96623a);
+  const woodLight = mat(0xc18a50);
+  const lampMetal = mat(0x283b45, .35, .65);
+  const lampGlow = new THREE.MeshStandardMaterial({
+    color:0xffd78a,emissive:0xffa52c,emissiveIntensity:2.1
+  });
+  const umbrellaMats = [
+    mat(0xe95e52),mat(0xf4d477),mat(0x45b9a0)
+  ];
+
+  // A wooden boardwalk leading toward the beach.
+  const dock = new THREE.Group();
+  island.add(dock);
+  dock.position.set(0,.99,6.15);
+  dock.rotation.y = Math.PI / 2;
+  for(let i=0;i<9;i++){
+    const plank=mesh(
+      new THREE.BoxGeometry(.48,.075,1.45),
+      i%2?wood:woodLight,dock,(i-4)*.49,0,0
+    );
+    plank.receiveShadow=true;
+  }
+  for(const x of [-2.05,2.05]){
+    mesh(new THREE.BoxGeometry(.13,.12,1.5),wood,dock,x,.015,0);
+  }
+  for(const z of [-.62,.62]){
+    for(const x of [-2.05,2.05]){
+      mesh(new THREE.CylinderGeometry(.09,.11,.72,8),wood,dock,x,-.27,z);
+    }
+  }
+
+  // Beach umbrellas and sun loungers.
+  const sandMat=mat(0xf3d7a0);
+  for(const pos of [[-4.8,2.4],[4.8,-2.5],[-4.3,-3.4]]){
+    const [x,z]=pos;
+    mesh(new THREE.CylinderGeometry(.055,.07,1.45,8),
+      wood,island,x,1.62,z);
+    const umbrella=mesh(
+      new THREE.ConeGeometry(.85,.34,12),
+      umbrellaMats[luxuryProps.length%umbrellaMats.length],
+      island,x,2.42,z
+    );
+    umbrella.rotation.y=.2;
+    mesh(new THREE.BoxGeometry(.42,.1,.95),mat(0xf5eee0),
+      island,x+.65,1.08,z+.12);
+    mesh(new THREE.BoxGeometry(.38,.09,.85),mat(0xf5eee0),
+      island,x+1.05,1.08,z+.12);
+    luxuryProps.push(umbrella);
+  }
+
+  // Warm path lanterns.
+  for(const pos of [[-1.2,3.6],[1.2,3.6],[-2.8,-.1],[2.8,-.1]]){
+    const [x,z]=pos;
+    const post=mesh(new THREE.CylinderGeometry(.045,.065,.62,8),
+      lampMetal,island,x,1.29,z);
+    mesh(new THREE.BoxGeometry(.22,.24,.22),lampMetal,
+      island,x,1.65,z);
+    const glow=mesh(new THREE.SphereGeometry(.085,12,10),
+      lampGlow,island,x,1.66,z);
+    luxuryProps.push(glow);
+  }
+
+  // Small decorative rocks along the shore.
+  const shoreRock=mat(0x9baeb0);
+  for(const pos of [[-7,0],[7,1],[-2,-7],[3,6.6]]){
+    const [x,z]=pos;
+    for(let i=0;i<3;i++){
+      const r=mesh(
+        new THREE.DodecahedronGeometry(.2+(i%2)*.1,0),
+        shoreRock,island,x+i*.24,.91,z+i*.12
+      );
+      r.rotation.set(i*.4,i*.8,i*.25);
+    }
+  }
+
+  // A little boat floating beside the island.
+  luxuryBoat=new THREE.Group();
+  scene.add(luxuryBoat);
+  const hull=mesh(
+    new THREE.BoxGeometry(1.9,.32,.75),wood,luxuryBoat,0,0,0
+  );
+  hull.rotation.y=.12;
+  mesh(new THREE.BoxGeometry(.75,.22,.56),mat(0xf7f0dd),
+    luxuryBoat,0,.24,0);
+  mesh(new THREE.ConeGeometry(.45,.65,4),mat(0xffffff),
+    luxuryBoat,.02,.72,0);
+  luxuryBoat.position.set(10,-.05,3.8);
+  luxuryBoat.rotation.y=-.35;
+
+  // A subtle golden sun glow in the distance.
+  const sunBall=mesh(
+    new THREE.SphereGeometry(1.35,24,20),
+    new THREE.MeshBasicMaterial({color:0xffe5a1}),
+    scene,-18,17,-35
+  );
+  sunBall.castShadow=false;
+  sunBall.receiveShadow=false;
+}
+
+
+/* ISLAND TYCOON GAMEPLAY UPGRADE */
+let milestoneFiveClaimed=false;
+let milestoneEightClaimed=false;
+
+function checkExpansionMilestones(){
+  if(buildings.length>=5 && !milestoneFiveClaimed){
+    milestoneFiveClaimed=true;
+    cash+=400;
+    toast('🏆 Resort expansion! Bonus +$400');
+  }
+  if(buildings.length>=8 && !milestoneEightClaimed){
+    milestoneEightClaimed=true;
+    cash+=800;
+    toast('🌟 Island destination unlocked! Bonus +$800');
+  }
+}
+
+const originalUpdateUI=updateUI;
+updateUI=function(){
+  checkExpansionMilestones();
+  originalUpdateUI();
+};
+
+const originalSaveGame=saveGame;
+function silentAutoSave(){
+  try{
+    const data={
+      cash,level,bonusClaimed,
+      milestoneFiveClaimed,milestoneEightClaimed,
+      buildings:buildings.map(b=>({
+        type:b.userData.buildingType,
+        x:b.position.x,z:b.position.z,
+        level:b.userData.level,income:b.userData.income
+      }))
+    };
+    localStorage.setItem('islandTycoonSaveV1',JSON.stringify(data));
+  }catch(e){
+    // The game remains playable if browser storage is unavailable.
+  }
+}
+
+const oldLoadGame=loadGame;
+loadGame=function(){
+  oldLoadGame();
+  try{
+    const data=JSON.parse(localStorage.getItem('islandTycoonSaveV1')||'null');
+    if(data){
+      milestoneFiveClaimed=Boolean(data.milestoneFiveClaimed);
+      milestoneEightClaimed=Boolean(data.milestoneEightClaimed);
+    }
+  }catch(e){}
+};
+
+window.addEventListener('keydown',event=>{
+  if(event.repeat)return;
+  const types=['hotel','restaurant','pool','palm','villa'];
+  const key=event.key.toLowerCase();
+  if(key>='1' && key<='5'){
+    chosenType=types[Number(key)-1];
+    selectBuilding(null);
+    updateUI();
+    toast('Selected: '+buildingTypes[chosenType].name);
+  }else if(key==='escape'){
+    selectBuilding(null);
+  }else if(key==='p'){
+    autoRotate=!autoRotate;
+    $('rotatebtn').style.borderColor=autoRotate?'#ffd166':'';
+  }else if(key==='s' && (event.ctrlKey||event.metaKey)){
+    event.preventDefault();
+    saveGame();
+  }
+});
+
+setInterval(silentAutoSave,20000);
+window.addEventListener('pagehide',silentAutoSave);
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden')silentAutoSave();
+});
+
 function animate(){
  requestAnimationFrame(animate);
 
@@ -646,6 +930,13 @@ function animate(){
   updateUI();
  }
 
+ if(luxuryBoat){
+  const t=now*.001;
+  luxuryBoat.position.x=10+Math.sin(t*.19)*1.7;
+  luxuryBoat.position.z=3.8+Math.cos(t*.19)*.8;
+  luxuryBoat.position.y=-.05+Math.sin(t*1.3)*.045;
+  luxuryBoat.rotation.z=Math.sin(t*1.3)*.025;
+ }
  renderer.render(scene,camera);
 }
 
@@ -658,6 +949,7 @@ $('selectedpanel').style.pointerEvents='auto';
 
 updateCamera();
 loadGame();
+setupLuxuryScene();
 updateUI();
 
 setTimeout(()=>{
