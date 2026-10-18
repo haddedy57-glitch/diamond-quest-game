@@ -1456,5 +1456,185 @@ font:12px/1.8 Arial,sans-serif;border-top:1px solid #ffffff20">
 })();
 </script>
 
+
+<!-- ISLAND_TYCOON_MOVING_PLAYER_V1 -->
+<style>
+#player-pad{
+ position:fixed;left:14px;bottom:24px;z-index:1000;
+ display:grid;grid-template-columns:54px 54px 54px;
+ grid-template-rows:54px 54px;gap:5px;
+ touch-action:none;user-select:none;
+}
+#player-pad button{
+ border:1px solid #ffffff88;border-radius:15px;
+ background:#102a40dd;color:white;font-size:24px;
+ font-weight:bold;box-shadow:0 3px 10px #0005;
+ touch-action:none;user-select:none;
+}
+#player-pad button.active{background:#16a085;color:white}
+#player-pad .up{grid-column:2;grid-row:1}
+#player-pad .left{grid-column:1;grid-row:2}
+#player-pad .down{grid-column:2;grid-row:2}
+#player-pad .right{grid-column:3;grid-row:2}
+#player-label{
+ position:fixed;left:14px;bottom:151px;z-index:1000;
+ padding:6px 10px;border-radius:9px;
+ background:#102a40dd;color:#fff;font:12px Arial,sans-serif;
+ pointer-events:none
+}
+@media(min-width:800px){
+ #player-pad{left:22px;bottom:22px}
+ #player-label{left:22px;bottom:150px}
+}
+</style>
+
+<div id="player-label">🧍 Move: WASD / Arrow keys</div>
+<div id="player-pad" aria-label="Player movement controls">
+ <button class="up" data-move="forward" aria-label="Move forward">▲</button>
+ <button class="left" data-move="left" aria-label="Move left">◀</button>
+ <button class="down" data-move="back" aria-label="Move backward">▼</button>
+ <button class="right" data-move="right" aria-label="Move right">▶</button>
+</div>
+
+<script>
+(function(){
+ 'use strict';
+ if(typeof THREE==='undefined'||typeof scene==='undefined'){
+   document.getElementById('player-label').textContent='Player unavailable: 3D scene not found';
+   return;
+ }
+
+ const player=new THREE.Group();
+ player.name='IslandTycoonPlayer';
+
+ const skin=new THREE.MeshStandardMaterial({color:0xffc48a,roughness:.8});
+ const shirt=new THREE.MeshStandardMaterial({color:0x12a8a0,roughness:.75});
+ const pants=new THREE.MeshStandardMaterial({color:0x263b68,roughness:.85});
+ const shoes=new THREE.MeshStandardMaterial({color:0x202631,roughness:.8});
+ const hair=new THREE.MeshStandardMaterial({color:0x38261d,roughness:1});
+
+ function part(geometry,material,x,y,z){
+   const m=new THREE.Mesh(geometry,material);
+   m.position.set(x,y,z);
+   m.castShadow=true;
+   m.receiveShadow=true;
+   player.add(m);
+   return m;
+ }
+
+ // Stylized 3D human character; the feet sit on the island surface.
+ part(new THREE.SphereGeometry(.22,16,12),skin,0,1.48,0); // head
+ part(new THREE.SphereGeometry(.225,16,8,0,Math.PI*2,0,Math.PI*.55),
+      hair,0,1.57,-.035);
+ part(new THREE.CylinderGeometry(.19,.25,.53,12),shirt,0,1.04,0);
+ part(new THREE.CylinderGeometry(.105,.13,.38,10),pants,-.105,.59,0);
+ part(new THREE.CylinderGeometry(.105,.13,.38,10),pants,.105,.59,0);
+ part(new THREE.BoxGeometry(.16,.10,.27),shoes,-.105,.37,-.045);
+ part(new THREE.BoxGeometry(.16,.10,.27),shoes,.105,.37,-.045);
+ const armL=part(new THREE.CylinderGeometry(.065,.08,.43,10),shirt,-.27,1.08,0);
+ const armR=part(new THREE.CylinderGeometry(.065,.08,.43,10),shirt,.27,1.08,0);
+ armL.rotation.z=-.18;
+ armR.rotation.z=.18;
+ part(new THREE.SphereGeometry(.07,10,8),skin,-.29,.84,0);
+ part(new THREE.SphereGeometry(.07,10,8),skin,.29,.84,0);
+
+ // Small eyes on the front of the character.
+ const eyeMat=new THREE.MeshBasicMaterial({color:0x202020});
+ part(new THREE.SphereGeometry(.025,8,6),eyeMat,-.075,1.50,-.195);
+ part(new THREE.SphereGeometry(.025,8,6),eyeMat,.075,1.50,-.195);
+
+ player.position.set(0,1.02,5);
+ scene.add(player);
+
+ const pressed=new Set();
+ const held=new Set();
+ const pad=document.getElementById('player-pad');
+
+ function keyName(k){return k.toLowerCase()}
+ function onKeyDown(e){
+   if(e.ctrlKey||e.metaKey||e.altKey)return;
+   const tag=e.target&&e.target.tagName;
+   if(tag==='INPUT'||tag==='TEXTAREA'||(e.target&&e.target.isContentEditable))return;
+   const k=keyName(e.key);
+   if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(k)){
+     pressed.add(k);
+     e.preventDefault();
+   }
+ }
+ function onKeyUp(e){pressed.delete(keyName(e.key))}
+ window.addEventListener('keydown',onKeyDown,{passive:false});
+ window.addEventListener('keyup',onKeyUp);
+ window.addEventListener('blur',()=>{pressed.clear();held.clear()});
+
+ pad.querySelectorAll('button[data-move]').forEach(btn=>{
+   const down=e=>{
+     e.preventDefault();
+     held.add(btn.dataset.move);
+     btn.classList.add('active');
+     try{btn.setPointerCapture(e.pointerId)}catch(_){}
+   };
+   const up=e=>{
+     e.preventDefault();
+     held.delete(btn.dataset.move);
+     btn.classList.remove('active');
+   };
+   btn.addEventListener('pointerdown',down);
+   btn.addEventListener('pointerup',up);
+   btn.addEventListener('pointercancel',up);
+   btn.addEventListener('lostpointercapture',up);
+   btn.addEventListener('contextmenu',e=>e.preventDefault());
+ });
+
+ let last=performance.now();
+ let walkTime=0;
+ const maxRadius=21.8;
+ function moveFrame(now){
+   const dt=Math.min((now-last)/1000,.05);
+   last=now;
+
+   let x=0,z=0;
+   if(pressed.has('w')||pressed.has('arrowup')||held.has('forward'))z-=1;
+   if(pressed.has('s')||pressed.has('arrowdown')||held.has('back'))z+=1;
+   if(pressed.has('a')||pressed.has('arrowleft')||held.has('left'))x-=1;
+   if(pressed.has('d')||pressed.has('arrowright')||held.has('right'))x+=1;
+
+   const moving=x!==0||z!==0;
+   if(moving){
+     const length=Math.hypot(x,z);
+     x/=length; z/=length;
+     const speed=4.5;
+     const nx=player.position.x+x*speed*dt;
+     const nz=player.position.z+z*speed*dt;
+
+     // Keep the character on the main island.
+     if(Math.hypot(nx,nz)<=maxRadius){
+       player.position.x=nx;
+       player.position.z=nz;
+     }
+
+     // Face the direction of travel.
+     player.rotation.y=Math.atan2(-x,-z);
+     walkTime+=dt*11;
+     const swing=Math.sin(walkTime)*.38;
+     armL.rotation.x=swing;
+     armR.rotation.x=-swing;
+     player.children[3].rotation.x=-swing;
+     player.children[4].rotation.x=swing;
+     window.islandCameraFocusX=player.position.x;
+     window.islandCameraFocusZ=player.position.z;
+     if(typeof updateCamera==='function')updateCamera();
+     document.getElementById('player-label').textContent='🧍 Moving • WASD / touch arrows';
+   }else{
+     armL.rotation.x=0;
+     armR.rotation.x=0;
+     document.getElementById('player-label').textContent='🧍 Move: WASD / Arrow keys';
+   }
+
+   requestAnimationFrame(moveFrame);
+ }
+ requestAnimationFrame(moveFrame);
+})();
+</script>
+
 </body>
 </html>
