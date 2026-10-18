@@ -1636,5 +1636,27 @@ font:12px/1.8 Arial,sans-serif;border-top:1px solid #ffffff20">
 })();
 </script>
 
+<style>
+/* ISLAND_TYCOON_PLAYER_LAYOUT_FIX_V1 */
+@media (max-width: 700px) {
+  #player-pad {
+    left: 12px !important;
+    bottom: 540px !important;
+    grid-template-columns: 46px 46px 46px !important;
+    grid-template-rows: 46px 46px !important;
+    gap: 4px !important;
+  }
+  #player-pad button {
+    width: 46px !important;
+    height: 46px !important;
+    padding: 0 !important;
+    font-size: 20px !important;
+    border-radius: 12px !important;
+  }
+  #player-label {
+    display: none !important;
+  }
+}
+</style>
 </body>
 </html>
